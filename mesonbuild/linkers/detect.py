@@ -215,6 +215,16 @@ def guess_nix_linker(env: 'Environment', compiler: T.List[str], comp_class: T.Ty
         linker = linkers.AIXDynamicLinker(
             compiler, for_machine, comp_class.LINKER_PREFIX, override,
             version=search_version(e))
+    elif 'IEW5033' in e:
+        if isinstance(comp_class.LINKER_PREFIX, str):
+            _, o, e = Popen_safe(compiler + [comp_class.LINKER_PREFIX + '-V'] + extra_args)
+        else:
+            _, o, e = Popen_safe(compiler + comp_class.LINKER_PREFIX + ['-V'] + extra_args)
+        version = re.search(r'z/OS (V\d+ R\d+) BINDER', o)
+        version = 'unknown version' if version is None else version.group(1)
+        linker = linkers.ZOSDynamicLinker(
+            compiler, for_machine, comp_class.LINKER_PREFIX, override,
+            version=version)
     elif o.startswith('zig ld'):
         linker = linkers.ZigCCDynamicLinker(
             compiler, for_machine, comp_class.LINKER_PREFIX, override, version=v)

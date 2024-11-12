@@ -394,6 +394,10 @@ class ArLinker(ArLikeLinker, StaticLinker):
             return self.std_args
 
 
+class ZOSArLinker(ArLinker):
+    id = "zar"
+
+
 class AppleArLinker(ArLinker):
 
     # mostly this is used to determine that we need to call ranlib
@@ -1547,6 +1551,13 @@ class AIXDynamicLinker(PosixDynamicLinkerMixin, DynamicLinker):
 
     def thread_flags(self, env: 'Environment') -> T.List[str]:
         return ['-pthread']
+
+
+class ZOSDynamicLinker(PosixDynamicLinkerMixin, DynamicLinker):
+
+    """z/OS ld implementation."""
+
+    id = "ld.zos"
 
 
 class OptlinkDynamicLinker(VisualStudioLikeLinkerMixin, DynamicLinker):

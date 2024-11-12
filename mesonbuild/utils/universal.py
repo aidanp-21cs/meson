@@ -122,6 +122,7 @@ __all__ = [
     'is_openbsd',
     'is_osx',
     'is_qnx',
+    'is_zos',
     'is_sunos',
     'is_windows',
     'is_wsl',
@@ -620,6 +621,10 @@ class PerThreeMachineDefaultable(PerMachineDefaultable[T.Optional[_T]], PerThree
 
     def __repr__(self) -> str:
         return f'PerThreeMachineDefaultable({self.build!r}, {self.host!r}, {self.target!r})'
+
+
+def is_zos() -> bool:
+    return platform.system().lower() == 'os/390'
 
 
 def is_sunos() -> bool:

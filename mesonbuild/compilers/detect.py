@@ -6,6 +6,7 @@ from __future__ import annotations
 from ..mesonlib import (
     MesonException, EnvironmentException, MachineChoice, join_args,
     search_version, is_windows, Popen_safe, Popen_safe_logged, windows_proof_rm,
+    is_zos,
 )
 from ..envconfig import BinaryTable
 from .. import mlog
@@ -56,6 +57,11 @@ else:
         defaults['cpp'] = ['c++', 'g++', 'l++', 'clang++']
         defaults['objc'] = ['clang']
         defaults['objcpp'] = ['clang++']
+    elif is_zos():
+        defaults['c'] = ['ibm-clang', 'ibm-clang64']
+        defaults['cpp'] = ['ibm-clang++', 'ibm-clang++64']
+        defaults['objc'] = []
+        defaults['objcpp'] = []
     else:
         defaults['c'] = ['cc', 'gcc', 'clang', 'nvc', 'pgcc', 'icc', 'icx']
         defaults['cpp'] = ['c++', 'g++', 'clang++', 'nvc++', 'pgc++', 'icpc', 'icpx']
@@ -205,6 +211,8 @@ def detect_static_linker(env: 'Environment', compiler: Compiler) -> StaticLinker
         except OSError as e:
             popen_exceptions[join_args(linker + [arg])] = e
             continue
+        if "FSUMA930" in err:
+            return linkers.ZOSArLinker(compiler.for_machine, linker)
         if "xilib: executing 'lib'" in err:
             return linkers.IntelVisualStudioLinker(linker, getattr(compiler, 'machine', None))
         if '/OUT:' in out.upper() or '/OUT:' in err.upper():
