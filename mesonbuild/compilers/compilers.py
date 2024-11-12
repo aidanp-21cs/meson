@@ -69,12 +69,13 @@ lang_suffixes: T.Mapping[str, T.Tuple[str, ...]] = {
     'cython': ('pyx', ),
     'nasm': ('asm', 'nasm',),
     'masm': ('masm',),
+    'hlasm': ('hlasm',),
 }
 all_languages = lang_suffixes.keys()
 c_cpp_suffixes = {'h'}
 cpp_suffixes = set(lang_suffixes['cpp']) | c_cpp_suffixes
 c_suffixes = set(lang_suffixes['c']) | c_cpp_suffixes
-assembler_suffixes = {'s', 'S', 'sx', 'asm', 'masm'}
+assembler_suffixes = {'s', 'S', 'sx', 'asm', 'masm', 'hlasm'}
 llvm_ir_suffixes = {'ll'}
 all_suffixes = set(itertools.chain(*lang_suffixes.values(), assembler_suffixes, llvm_ir_suffixes, c_cpp_suffixes))
 source_suffixes = all_suffixes - header_suffixes

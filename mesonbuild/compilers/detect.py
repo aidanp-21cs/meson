@@ -1362,6 +1362,40 @@ def detect_masm_compiler(env: 'Environment', for_machine: MachineChoice) -> Comp
     _handle_exceptions(popen_exceptions, [comp])
     raise EnvironmentException('Unreachable code (exception to make mypy happy)')
 
+def detect_hlasm_compiler(env: 'Environment', for_machine: MachineChoice) -> Compiler:
+    from .asm import HlasmCompiler
+
+    is_cross = False
+
+    # When cross compiling and nasm is not defined in the cross file we can
+    # fallback to the build machine nasm.
+    compilers, _ = _get_compilers(env, 'as', for_machine, allow_build_machine=True)
+
+    # We need a C compiler to properly detect the machine info and linker
+    cc = detect_c_compiler(env, for_machine)
+    if not is_cross:
+        from ..environment import detect_machine_info
+        info = detect_machine_info({'c': cc})
+    else:
+        info = env.machines[for_machine]
+
+    popen_exceptions: T.Dict[str, Exception] = {}
+    for comp in compilers:
+        try:
+            output = Popen_safe_logged(comp + ['-v'], msg='Detecting compiler via')[1]
+        except OSError as e:
+            popen_exceptions[' '.join(comp + ['-v'])] = e
+            continue
+
+        version = search_version(output)
+        if 'FSUM0000I  Utility(as)' in output:
+            comp_class = HlasmCompiler
+            env.coredata.add_lang_args(comp_class.language, comp_class, for_machine, env)
+            return comp_class([], comp, version, for_machine, info, cc.linker, is_cross=is_cross)
+
+    _handle_exceptions(popen_exceptions, compilers)
+    raise EnvironmentException('Unreachable code (exception to make mypy happy)')
+
 # GNU/Clang defines and version
 # =============================
 
