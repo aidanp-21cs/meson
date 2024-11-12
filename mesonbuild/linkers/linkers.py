@@ -394,6 +394,10 @@ class ArLinker(ArLikeLinker, StaticLinker):
             return self.std_args
 
 
+class ZOSArLinker(ArLinker):
+    id = "zar"
+
+
 class AppleArLinker(ArLinker):
 
     # mostly this is used to determine that we need to call ranlib
@@ -754,6 +758,13 @@ class GnuLikeDynamicLinkerMixin(DynamicLinkerBase):
             raise mesonlib.MesonBugException(f'win_subsystem: {value!r} not handled in MinGW linker. This should not be possible.')
 
         return self._apply_prefix(args)
+
+
+class ZOSDynamicLinker(PosixDynamicLinkerMixin, DynamicLinker):
+
+    """z/OS ld implementation."""
+
+    id = "ldz"
 
 
 class AppleDynamicLinker(PosixDynamicLinkerMixin, DynamicLinker):

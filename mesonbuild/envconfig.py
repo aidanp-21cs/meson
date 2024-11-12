@@ -362,6 +362,12 @@ class MachineInfo(HoldableObject):
         """
         return self.system == 'aix'
 
+    def is_zos(self) -> bool:
+        """
+        Machine is z/OS?
+        """
+        return self.system == 'os/390'
+
     def is_irix(self) -> bool:
         """Machine is IRIX?"""
         return self.system.startswith('irix')
